@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { guard } from "@/lib/api-guard";
 import { getToken } from "next-auth/jwt";
@@ -21,7 +21,7 @@ export async function GET(
 }
 
 export async function POST(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const forbidden = await guard(["ADMIN", "MANAGER", "EDITOR", "LEGAL", "REQUESTER", "CROWD"]);
