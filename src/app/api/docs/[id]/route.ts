@@ -4,10 +4,11 @@ import { requireRole } from "@/lib/authz";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params?.id ?? new URL(_request.url).pathname.split("/").pop();
+    const resolved = await params;
+    const id = resolved?.id ?? new URL(_request.url).pathname.split("/").pop();
     if (!id) {
       return NextResponse.json({ error: "Missing id" }, { status: 400 });
     }
@@ -21,10 +22,11 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params?.id ?? new URL(request.url).pathname.split("/").pop();
+    const resolved = await params;
+    const id = resolved?.id ?? new URL(request.url).pathname.split("/").pop();
     if (!id) {
       return NextResponse.json({ error: "Missing id" }, { status: 400 });
     }
@@ -64,10 +66,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params?.id ?? new URL(request.url).pathname.split("/").pop();
+    const resolved = await params;
+    const id = resolved?.id ?? new URL(request.url).pathname.split("/").pop();
     if (!id) {
       return NextResponse.json({ error: "Missing id" }, { status: 400 });
     }
