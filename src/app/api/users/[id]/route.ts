@@ -4,16 +4,17 @@ import { guard } from "@/lib/api-guard";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const forbidden = await guard(["ADMIN"]);
     if (forbidden) return forbidden;
     const body = await request.json();
     const { role, team, extraRoles } = body;
+    const resolved = await params;
 
     const updated = await prisma.user.update({
-      where: { id: params.id },
+      where: { id: resolved.id },
       data: {
         role,
         team,
