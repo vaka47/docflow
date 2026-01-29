@@ -1,0 +1,52 @@
+CREATE TYPE "UserRole" AS ENUM ('ADMIN','MANAGER','EDITOR','CROWD','LEGAL','REQUESTER');
+CREATE TYPE "RequestStatus" AS ENUM ('NEW','TRIAGE','IN_PROGRESS','REVIEW','APPROVAL','PUBLISHED');
+CREATE TYPE "RequestType" AS ENUM ('FEATURE','CHANGE','REGULATORY','FAQ','OTHER');
+
+CREATE TABLE "User" (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  role "UserRole" NOT NULL DEFAULT 'MANAGER',
+  password TEXT NOT NULL,
+  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE "Request" (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  audience TEXT NOT NULL DEFAULT 'Пользователи сервиса',
+  type "RequestType" NOT NULL DEFAULT 'OTHER',
+  status "RequestStatus" NOT NULL DEFAULT 'NEW',
+  "slaDays" INT NOT NULL DEFAULT 7,
+  "dueAt" TIMESTAMP NULL,
+  "ownerId" TEXT NOT NULL REFERENCES "User"(id),
+  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+  "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+  "publishedAt" TIMESTAMP NULL
+);
+
+CREATE TABLE "Activity" (
+  id TEXT PRIMARY KEY,
+  "requestId" TEXT NOT NULL REFERENCES "Request"(id),
+  "userId" TEXT NOT NULL REFERENCES "User"(id),
+  action TEXT NOT NULL,
+  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE "KnowledgeBaseItem" (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  tags TEXT[] NOT NULL DEFAULT '{}',
+  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE "IntegrationLog" (
+  id TEXT PRIMARY KEY,
+  "requestId" TEXT NOT NULL REFERENCES "Request"(id),
+  system TEXT NOT NULL,
+  status TEXT NOT NULL,
+  payload TEXT NOT NULL,
+  "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+);

@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  EDITOR
+  CROWD
+  LEGAL
+  REQUESTER
+}
+
+enum RequestStatus {
+  NEW
+  TRIAGE
+  IN_PROGRESS
+  REVIEW
+  APPROVAL
+  PUBLISHED
+}
+
+enum RequestType {
+  FEATURE
+  CHANGE
+  REGULATORY
+  FAQ
+  OTHER
+}
+
+model User {
+  id         String     @id @default(cuid())
+  name       String
+  email      String     @unique
+  role       UserRole   @default(MANAGER)
+  team       String     @default("Managers")
+  extraRoles String[]
+  password   String
+  createdAt  DateTime   @default(now())
+  requests   Request[]  @relation("OwnerRequests")
+  activities Activity[]
+}
+
+model Request {
+  id           String           @id @default(cuid())
+  title        String
+  description  String
+  audience     String           @default("Пользователи сервиса")
+  type         RequestType      @default(OTHER)
+  status       RequestStatus    @default(NEW)
+  slaDays      Int              @default(7)
+  dueAt        DateTime?
+  ownerId      String
+  owner        User             @relation("OwnerRequests", fields: [ownerId], references: [id])
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  publishedAt  DateTime?
+  activities   Activity[]
+  integrations IntegrationLog[]
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  requestId String
+  request   Request  @relation(fields: [requestId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  createdAt DateTime @default(now())
+}
+
+model KnowledgeBaseItem {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  tags      String[]
+  createdAt DateTime @default(now())
+}
+
+model IntegrationLog {
+  id        String   @id @default(cuid())
+  requestId String
+  request   Request  @relation(fields: [requestId], references: [id])
+  system    String
+  status    String
+  payload   String
+  createdAt DateTime @default(now())
+}
+
+model Document {
+  id         String            @id @default(cuid())
+  title      String
+  content    String
+  version    String
+  sections   String[]
+  publishedAt DateTime?
+  updatedAt  DateTime          @updatedAt
+  versions   DocumentVersion[]
+  comments   DocumentComment[]
+}
+
+model DocumentVersion {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+  title      String
+  content    String
+  version    String
+  createdAt  DateTime @default(now())
+}
+
+model DocumentComment {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+  author     String
+  line       Int?
+  content    String
+  createdAt  DateTime @default(now())
+}
