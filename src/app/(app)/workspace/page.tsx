@@ -383,7 +383,7 @@ export default function WorkspacePage() {
       const payload = event.data;
       if (!payload || payload.clientId === clientId) return;
       if (payload.type === "content" && editor) {
-        editor.commands.setContent(payload.content, false);
+        editor.commands.setContent(payload.content);
       }
       if (payload.type === "presence") {
         setPresence((prev) => {
