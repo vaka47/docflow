@@ -7,7 +7,7 @@ MVP за 24 часа: единый intake, workflow, DocOps и интеграц�
 - React 19
 - Tailwind CSS v4
 - Postgres + Prisma
-- NextAuth Credentials (email + password)
+- NextAuth Credentials (демо‑вход по выбору пользователя)
 
 ## Запуск (локально)
 ```bash
@@ -28,38 +28,10 @@ docker-compose up -d
 npx prisma generate
 npx prisma migrate dev --name init
 ```
-Если migrate недоступен, можно применить SQL напрямую:
-```bash
-PGPASSWORD=docflow psql -h 127.0.0.1 -U docflow -d docflow -f scripts/bootstrap.sql
-```
 
-## Seed демо-данных
-После миграций можно заполнить демо-данными:
-- Откройте `/admin` и нажмите **Seed demo data**
- - Демо‑пользователи: `anna@yandex.ru`, `ilya@yandex.ru`, `maria@yandex.ru` пароль `password123`
-
-## Auth
-- Регистрация: `/register`
-- Вход: `/login`
-- Быстрый seed: `/setup`
-
-## Документы (DB)
-Для хранения документов в БД выполните:
-```bash
-PGPASSWORD=docflow psql -h 127.0.0.1 -U docflow -d docflow -f scripts/upgrade_docs.sql
-```
-Для комментариев:
-```bash
-PGPASSWORD=docflow psql -h 127.0.0.1 -U docflow -d docflow -f scripts/upgrade_comments.sql
-```
-Для поля аудитории заявки:
-```bash
-PGPASSWORD=docflow psql -h 127.0.0.1 -U docflow -d docflow -f scripts/upgrade_audience.sql
-```
-Для дедлайнов (dueAt):
-```bash
-PGPASSWORD=docflow psql -h 127.0.0.1 -U docflow -d docflow -f scripts/upgrade_dueat.sql
-```
+## Демо‑вход
+Вход без пароля через `/login` (выбор пользователя из списка).
+Админ: `admin@docflow.local`.
 
 ## Уведомления
 Опционально подключить SMTP/чат:
@@ -67,8 +39,12 @@ PGPASSWORD=docflow psql -h 127.0.0.1 -U docflow -d docflow -f scripts/upgrade_du
 - `CHAT_WEBHOOK_URL`
 
 ## Деплой
-- Vercel: импортируйте репозиторий, задайте переменные окружения.
-- Яндекс сервер: `npm run build` и `npm start`.
+Vercel:
+- `DATABASE_URL`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL` (например, `https://<project>.vercel.app`)
+
+Яндекс сервер: `npm run build` и `npm start`.
 
 ## Что внутри
 - /workflow — end-to-end board
