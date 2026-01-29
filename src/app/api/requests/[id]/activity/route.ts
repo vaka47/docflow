@@ -5,13 +5,14 @@ import { getToken } from "next-auth/jwt";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const forbidden = await guard(["ADMIN", "MANAGER", "EDITOR", "LEGAL", "REQUESTER", "CROWD"]);
   if (forbidden) return forbidden;
 
+  const resolved = await params;
   const items = await prisma.activity.findMany({
-    where: { requestId: params.id },
+    where: { requestId: resolved.id },
     include: { user: true },
     orderBy: { createdAt: "desc" },
   });
@@ -21,10 +22,11 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const forbidden = await guard(["ADMIN", "MANAGER", "EDITOR", "LEGAL", "REQUESTER", "CROWD"]);
   if (forbidden) return forbidden;
+  const resolved = await params;
   const body = await request.json();
   const { action } = body;
 
@@ -41,7 +43,7 @@ export async function POST(
 
   const created = await prisma.activity.create({
     data: {
-      requestId: params.id,
+      requestId: resolved.id,
       userId: user.id,
       action,
     },
