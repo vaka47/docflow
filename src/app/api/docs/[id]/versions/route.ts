@@ -4,11 +4,12 @@ import { guard } from "@/lib/api-guard";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolved = await params;
     const versions = await prisma.documentVersion.findMany({
-      where: { documentId: params.id },
+      where: { documentId: resolved.id },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(versions);
@@ -19,9 +20,10 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolved = await params;
     const forbidden = await guard(["ADMIN", "MANAGER", "EDITOR"]);
     if (forbidden) return forbidden;
     const body = await request.json();
@@ -32,7 +34,7 @@ export async function POST(
     if (!version) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const doc = await prisma.document.update({
-      where: { id: params.id },
+      where: { id: resolved.id },
       data: {
         title: version.title,
         content: version.content,
