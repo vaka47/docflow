@@ -197,7 +197,7 @@ export default function WorkspacePage() {
     if (!active.content) return;
     const current = editor.getHTML();
     if (current !== active.content) {
-      editor.commands.setContent(active.content, false);
+      editor.commands.setContent(active.content);
     }
   }, [editor, active, activeId]);
 
