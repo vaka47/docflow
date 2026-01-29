@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { guard } from "@/lib/api-guard";
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const forbidden = await guard(["MANAGER"]);
   if (forbidden) return forbidden;
   let body: { title?: string; content?: string; tags?: string[] } = {};
@@ -13,7 +13,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   }
   const { title, content, tags } = body;
   const urlId = request.url.split("/api/kb/")[1]?.split("?")[0];
-  const id = params?.id || urlId;
+  const resolved = await params;
+  const id = resolved?.id || urlId;
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
@@ -37,11 +38,12 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   return NextResponse.json(updated);
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const forbidden = await guard(["MANAGER"]);
   if (forbidden) return forbidden;
   const urlId = request.url.split("/api/kb/")[1]?.split("?")[0];
-  const id = params?.id || urlId;
+  const resolved = await params;
+  const id = resolved?.id || urlId;
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
