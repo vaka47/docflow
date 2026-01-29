@@ -360,7 +360,7 @@ export default function WorkflowBoardClient() {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-1">
         {filterOptions.map((key) => (
           <button
             key={key}
@@ -386,11 +386,11 @@ export default function WorkflowBoardClient() {
         )}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-6">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {grouped.map((column) => (
           <div
             key={column.status}
-            className="surface p-4"
+            className="surface p-4 min-w-0"
             onDragOver={(event) => {
               if (!canEdit) return;
               event.preventDefault();
@@ -412,7 +412,7 @@ export default function WorkflowBoardClient() {
                 return (
                   <div
                     key={item.id}
-                    className={`rounded-2xl border bg-white p-3 text-sm transition hover:border-[var(--accent)] cursor-pointer ${
+                    className={`rounded-2xl border bg-white p-3 text-sm transition hover:border-[var(--accent)] cursor-pointer min-w-0 break-words ${
                       isMine ? "border-[var(--accent)]" : "border-black/10"
                     }`}
                     role="button"
@@ -425,7 +425,7 @@ export default function WorkflowBoardClient() {
                     }}
                   >
                     <p className="text-xs text-black/40">{item.id.slice(-4).toUpperCase()}</p>
-                    <p className="mt-2 font-semibold">{item.title}</p>
+                    <p className="mt-2 font-semibold break-words">{item.title}</p>
                     <div className="mt-3 flex items-center justify-between text-xs text-black/50">
                       <span>{item.owner.name}</span>
                       <span className="rounded-full bg-black/5 px-2 py-1">SLA {item.slaDays}d</span>
