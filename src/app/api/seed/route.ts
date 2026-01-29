@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       seedUsers.map(async (user) => {
         return prisma.user.upsert({
           where: { email: user.email },
-          data: {
+          create: {
             ...user,
             password,
             role: user.role as UserRole,
