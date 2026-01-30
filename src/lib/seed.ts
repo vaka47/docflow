@@ -109,6 +109,24 @@ export function generateSeedUsers(count: number) {
 
 export const seedRequests = [
   {
+    title: "Глоссарий терминов для B2B рассылок",
+    description: "Нужен базовый словарь для новых команд",
+    type: "OTHER",
+    status: "BACKLOG",
+    slaDays: 14,
+    audience: "Партнеры B2B",
+    ownerIndex: 1,
+  },
+  {
+    title: "Шаблон FAQ для новых регионов",
+    description: "Собрать универсальный шаблон для локальных запусков",
+    type: "FAQ",
+    status: "BACKLOG",
+    slaDays: 10,
+    audience: "Внутренние команды",
+    ownerIndex: 2,
+  },
+  {
     title: "FAQ по запуску Алисы в корпоративном режиме",
     description: "Нужны сценарии для B2B клиентов",
     type: "FAQ",

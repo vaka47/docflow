@@ -49,7 +49,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const forbidden = await guard(["ADMIN", "MANAGER", "EDITOR"]);
+    const forbidden = await guard(["ADMIN", "MANAGER", "EDITOR", "REQUESTER"]);
     if (forbidden) return forbidden;
     const body = await request.json();
     const { title, description, type, slaDays, ownerId, audience, dueAt } = body;

@@ -1,5 +1,13 @@
 export const workflowColumns = [
   {
+    title: "Backlog",
+    tone: "bg-stone-100 text-stone-900",
+    items: [
+      { id: "R-110", title: "Глоссарий терминов для B2B рассылок", owner: "Product", sla: "backlog" },
+      { id: "R-112", title: "Шаблон FAQ для новых регионов", owner: "Менеджер", sla: "backlog" },
+    ],
+  },
+  {
     title: "New",
     tone: "bg-amber-100 text-amber-900",
     items: [

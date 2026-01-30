@@ -64,7 +64,7 @@ export default function IntakePage() {
       return;
     }
 
-    setSubmitted("Заявка создана · статус NEW");
+    setSubmitted("Заявка создана · статус BACKLOG");
     event.currentTarget.reset();
   }
 

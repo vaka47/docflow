@@ -2,6 +2,7 @@ import WorkflowBoardClient from "./WorkflowBoardClient";
 import WorkflowArtifactsClient from "./WorkflowArtifactsClient";
 import WorkflowCalendarClient from "./WorkflowCalendarClient";
 import ApprovalInboxClient from "./ApprovalInboxClient";
+import BacklogListClient from "./BacklogListClient";
 import { Suspense } from "react";
 
 export default function WorkflowPage() {
@@ -14,6 +15,7 @@ export default function WorkflowPage() {
       <WorkflowCalendarClient />
 
       <ApprovalInboxClient />
+      <BacklogListClient />
 
       <section className="surface p-8">
         <h2 className="section-title text-2xl">Ключевые артефакты</h2>

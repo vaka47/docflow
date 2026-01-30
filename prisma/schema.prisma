@@ -18,6 +18,7 @@ enum UserRole {
 }
 
 enum RequestStatus {
+  BACKLOG
   NEW
   TRIAGE
   IN_PROGRESS
@@ -53,7 +54,7 @@ model Request {
   description  String
   audience     String           @default("Пользователи сервиса")
   type         RequestType      @default(OTHER)
-  status       RequestStatus    @default(NEW)
+  status       RequestStatus    @default(BACKLOG)
   slaDays      Int              @default(7)
   dueAt        DateTime?
   ownerId      String

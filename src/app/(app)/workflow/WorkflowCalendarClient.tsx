@@ -19,6 +19,7 @@ type RequestItem = {
 type View = "month" | "week";
 
 const statusTone: Record<string, string> = {
+  BACKLOG: "bg-stone-100 text-stone-900",
   NEW: "bg-amber-100 text-amber-900",
   TRIAGE: "bg-emerald-100 text-emerald-900",
   IN_PROGRESS: "bg-blue-100 text-blue-900",
@@ -58,7 +59,8 @@ export default function WorkflowCalendarClient() {
       return;
     }
     const data = await res.json();
-    setRequests(Array.isArray(data) ? data : []);
+    const list = Array.isArray(data) ? data : [];
+    setRequests(list.filter((item) => item.status !== "BACKLOG"));
   }
 
   useEffect(() => {
@@ -155,51 +157,55 @@ export default function WorkflowCalendarClient() {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-2 text-xs text-black/50 md:grid-cols-7">
-        {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((label) => (
-          <div key={label} className="text-center">{label}</div>
-        ))}
-      </div>
+      <div className="mt-4 overflow-x-auto pb-2">
+        <div className="min-w-[720px]">
+          <div className="grid grid-cols-7 gap-2 text-xs text-black/50">
+            {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((label) => (
+              <div key={label} className="text-center">{label}</div>
+            ))}
+          </div>
 
-      <div className="mt-2 grid gap-2 md:grid-cols-7">
-        {days.map((day) => {
-          const key = toKey(day);
-          const isCurrentMonth = day.getMonth() === current.getMonth();
-          return (
-            <div
-              key={key}
-              className={`flex min-h-[120px] flex-col rounded-2xl border border-black/10 bg-white p-2 ${isCurrentMonth ? "" : "opacity-40"}`}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => onDrop(event, day)}
-            >
-              <div className="flex items-center justify-between text-xs text-black/50">
-                <span>{day.getDate()}</span>
-                <span>{day.toLocaleDateString("ru-RU", { month: "short" })}</span>
-              </div>
-              <div className="mt-2 grid max-h-[120px] flex-1 gap-1 overflow-auto pr-1">
-                {(grouped[key] ?? []).map((item) => (
-                  <button
-                    key={item.id}
-                    className="flex max-w-full items-center justify-between gap-2 overflow-hidden rounded-xl border border-black/10 bg-white px-2 py-1 text-left text-xs hover:border-[var(--accent)]"
-                    draggable
-                    onDragStart={(event) => event.dataTransfer.setData("text/plain", item.id)}
-                    onClick={() => setActive(item)}
-                  >
-                    <span className="min-w-0 flex-1 truncate">{item.title}</span>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${statusTone[item.status] || "bg-black/5"}`}>
-                      {item.status.replace("_", " ")}
-                    </span>
-                  </button>
-                ))}
-                {(grouped[key] ?? []).length === 0 && (
-                  <div className="rounded-xl border border-dashed border-black/10 px-2 py-1 text-[10px] text-black/30">
-                    —
+          <div className="mt-2 grid grid-cols-7 gap-2">
+            {days.map((day) => {
+              const key = toKey(day);
+              const isCurrentMonth = day.getMonth() === current.getMonth();
+              return (
+                <div
+                  key={key}
+                  className={`flex min-h-[96px] flex-col rounded-2xl border border-black/10 bg-white p-2 ${isCurrentMonth ? "" : "opacity-40"}`}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => onDrop(event, day)}
+                >
+                  <div className="flex items-center justify-between text-xs text-black/50">
+                    <span>{day.getDate()}</span>
+                    <span>{day.toLocaleDateString("ru-RU", { month: "short" })}</span>
                   </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+                  <div className="mt-2 grid max-h-[96px] flex-1 gap-1 overflow-auto pr-1">
+                    {(grouped[key] ?? []).map((item) => (
+                      <button
+                        key={item.id}
+                        className="flex max-w-full items-center justify-between gap-2 overflow-hidden rounded-xl border border-black/10 bg-white px-2 py-1 text-left text-xs hover:border-[var(--accent)]"
+                        draggable
+                        onDragStart={(event) => event.dataTransfer.setData("text/plain", item.id)}
+                        onClick={() => setActive(item)}
+                      >
+                        <span className="min-w-0 flex-1 truncate">{item.title}</span>
+                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${statusTone[item.status] || "bg-black/5"}`}>
+                          {item.status.replace("_", " ")}
+                        </span>
+                      </button>
+                    ))}
+                    {(grouped[key] ?? []).length === 0 && (
+                      <div className="rounded-xl border border-dashed border-black/10 px-2 py-1 text-[10px] text-black/30">
+                        —
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <Modal open={Boolean(active)} title={active?.title ?? ""} onClose={() => setActive(null)}>
