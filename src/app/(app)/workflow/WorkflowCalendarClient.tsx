@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "@/components/Modal";
 
 type Owner = { id: string; name: string; email: string; role: string };
@@ -51,6 +51,7 @@ export default function WorkflowCalendarClient() {
   const [view, setView] = useState<View>("week");
   const [current, setCurrent] = useState<Date>(() => new Date());
   const [active, setActive] = useState<RequestItem | null>(null);
+  const lastCountRef = useRef<number | null>(null);
 
   async function load() {
     const res = await fetch("/api/requests", { cache: "no-store" });
@@ -70,7 +71,23 @@ export default function WorkflowCalendarClient() {
 
   useEffect(() => {
     const es = new EventSource("/api/stream/requests");
-    es.onmessage = () => load();
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        const count = typeof data?.count === "number" ? data.count : null;
+        if (count === null || lastCountRef.current === null) {
+          lastCountRef.current = count;
+          load();
+          return;
+        }
+        if (count !== lastCountRef.current) {
+          lastCountRef.current = count;
+          load();
+        }
+      } catch {
+        load();
+      }
+    };
     return () => es.close();
   }, []);
 

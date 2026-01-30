@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "@/components/Modal";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -47,6 +47,7 @@ export default function WorkflowBoardClient() {
   type Filter = "all" | "mine" | "overdue" | "regulatory" | "team";
   const [filter, setFilter] = useState<Filter>("all");
   const [now] = useState(() => Date.now());
+  const lastCountRef = useRef<number | null>(null);
   const searchParams = useSearchParams();
 
   async function load() {
@@ -115,8 +116,22 @@ export default function WorkflowBoardClient() {
 
   useEffect(() => {
     const es = new EventSource("/api/stream/requests");
-    es.onmessage = () => {
-      load();
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        const count = typeof data?.count === "number" ? data.count : null;
+        if (count === null || lastCountRef.current === null) {
+          lastCountRef.current = count;
+          load();
+          return;
+        }
+        if (count !== lastCountRef.current) {
+          lastCountRef.current = count;
+          load();
+        }
+      } catch {
+        load();
+      }
     };
     return () => es.close();
   }, []);
